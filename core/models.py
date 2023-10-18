@@ -12,7 +12,7 @@ class Usuario (models.Model):
 class Vehiculo (models.Model):
     patente = models.CharField(primary_key=True, max_length=6, verbose_name='Patente del Vehiculo')
     marca = models.CharField(max_length=30, verbose_name='Marca del Vehiculo')
-    modelo = models.CharField(max_length=30, verbose_name='Modelo del Vehiculo')
+    modelo = models.CharField(max_length=30, verbose_name='Modelo  del Vehiculo')
     categoria = models.CharField(max_length=30, verbose_name='Categoria del Vehiculo')
     def __str__(self):
         return str(self.patente)
