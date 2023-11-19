@@ -9,4 +9,4 @@ class VehiculoSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['id', 'nombre', 'password']
+        fields = ['id_usuario', 'nombre_usuario', 'password_usuario']
