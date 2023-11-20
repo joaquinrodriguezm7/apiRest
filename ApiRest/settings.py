@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'core',
-    'rest_vehiculo',
+    'corsheaders',
+    'rest_vehiculo'
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8100',
+)
 
 ROOT_URLCONF = 'ApiRest.urls'
 
@@ -126,3 +132,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS =[
+    "http://localhost:8100",
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
