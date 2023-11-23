@@ -19,6 +19,21 @@ class UserView(APIView):
             return JsonResponse(status=400)
         except Exception as e:
             return JsonResponse(status=500)
+    def put(self, request):
+        try:
+            data = JSONParser().parse(request)
+            usuario = data['usuario']
+            nuevaPass = data['pass']
+
+            usuario = Usuario.objects.get(nombre_usuario = usuario)
+
+            usuario.password_usuario = nuevaPass
+            usuario.save()
+            return JsonResponse({'mensaje': 'La contraseña se ha modificado correctamente'})
+        except Usuario.DoesNotExist:
+            return  JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': 'Error interno del servidor'}, status=500)
         
 
         
