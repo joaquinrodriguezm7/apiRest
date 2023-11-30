@@ -35,9 +35,6 @@ class UserView(APIView):
         except Exception as e:
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
         
-
-        
-        
     def get(self, request):
         serializer = UsuarioSerializer(Usuario.objects.all(), many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
