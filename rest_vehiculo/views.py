@@ -1,8 +1,9 @@
+from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import UsuarioSerializer
-from core.models import Usuario
+from .serializers import UsuarioSerializer, VehiculoSerializer
+from core.models import Usuario, Vehiculo
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.views import status
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
 # Create your views here.
@@ -38,3 +39,22 @@ class UserView(APIView):
     def get(self, request):
         serializer = UsuarioSerializer(Usuario.objects.all(), many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+    
+class VehiculoView(APIView):
+    def get(self, request):
+        serializer = VehiculoSerializer(Vehiculo.objects.all(), many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+    
+    def post(self,request):
+        try:
+            data = JSONParser().parse(request)
+            Vehiculo.objects.create(
+                patente=data['patente'],
+                marca=data['marca'],
+                modelo=data['modelo'],
+                capacidad=data['capacidad'],
+                id_usuario=data['id_usuario']
+            )
+            return JsonResponse({"mensaje":"El Vehiculo se ha registrado exitosamente"}, status=200) 
+        except Exception as e:
+            return JsonResponse({'error': 'Error interno del servidor'}, status=500)

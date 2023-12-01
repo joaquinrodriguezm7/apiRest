@@ -4,8 +4,8 @@ from core.models import Usuario
 class VehiculoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehiculo
-        fields = ['patente', 'marca','modelo', 'categoria']
-        
+        fields = ['patente', 'marca','modelo','capacidad']
+        safe = False
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
