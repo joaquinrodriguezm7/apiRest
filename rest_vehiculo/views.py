@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import UsuarioSerializer, VehiculoSerializer
-from core.models import Usuario, Vehiculo
+from .serializers import UsuarioSerializer, VehiculoSerializer, ViajeSerializer
+from core.models import Usuario, Vehiculo, Viaje
 from rest_framework.response import Response
 from rest_framework.views import status
 from rest_framework.parsers import JSONParser
@@ -53,8 +53,29 @@ class VehiculoView(APIView):
                 marca=data['marca'],
                 modelo=data['modelo'],
                 capacidad=data['capacidad'],
-                id_usuario=data['id_usuario']
+                nombre_usuario_id=data['nombre_usuario'],
             )
             return JsonResponse({"mensaje":"El Vehiculo se ha registrado exitosamente"}, status=200) 
         except Exception as e:
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
+        
+class ViajeView(APIView):
+    def get(self, request):
+        serializer = ViajeSerializer(Viaje.objects.all(), many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+    
+    def post(self,request):
+        try:
+            data = JSONParser().parse(request)
+            Viaje.objects.create(
+                inicio=data['inicio'],
+                termino=data['termino'],
+                costo=data['costo'],
+                patente=data['patente'],
+                nombre_usuario_dueño=data['nombre_usuario_dueño'],
+                nombre_usuario_cliente=data['nombre_usuario_cliente'],
+            )
+            return JsonResponse({"mensaje":"El Viaje se ha registrado exitosamente"}, status=200) 
+        except Exception as e:
+            return JsonResponse({'error': 'Error interno del servidor'}, status=500)
+        
