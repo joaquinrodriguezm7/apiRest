@@ -62,7 +62,7 @@ class VehiculoView(APIView):
 class ViajeView(APIView):
     def get(self, request):
         serializer = ViajeSerializer(Viaje.objects.all(), many=True)
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return Response(status=status.HTTP_200_OK, data=serializer.data,safe=False)
     
     def post(self,request):
         try:
@@ -71,11 +71,10 @@ class ViajeView(APIView):
                 inicio=data['inicio'],
                 termino=data['termino'],
                 costo=data['costo'],
-                patente=data['patente'],
-                nombre_usuario_dueño=data['nombre_usuario_dueño'],
-                nombre_usuario_cliente=data['nombre_usuario_cliente'],
+                patente_id=data['patente'],
+                nombre_usuario_dueño_id=data['nombre_usuario_dueño'],
             )
-            return JsonResponse({"mensaje":"El Viaje se ha registrado exitosamente"}, status=200) 
+            return JsonResponse({"mensaje":"El Viaje se ha registrado exitosamente"}, status=200,safe=False) 
         except Exception as e:
-            return JsonResponse({'error': 'Error interno del servidor'}, status=500)
+            return JsonResponse(str(e), status=500)
         
