@@ -62,7 +62,7 @@ class VehiculoView(APIView):
 class ViajeView(APIView):
     def get(self, request):
         serializer = ViajeSerializer(Viaje.objects.all(), many=True)
-        return Response(status=status.HTTP_200_OK, data=serializer.data,safe=False)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
     
     def post(self,request):
         try:
@@ -78,3 +78,19 @@ class ViajeView(APIView):
         except Exception as e:
             return JsonResponse(str(e), status=500)
         
+    def put(self,request):
+        try:
+            data = JSONParser().parse(request)
+            id_viaje=data['id_viaje']
+            nombre_usuario_cliente = data['nombre_usuario_cliente']
+
+            viaje = Viaje.objects.get(id_viaje=id_viaje)
+            
+            viaje.nombre_usuario_cliente = nombre_usuario_cliente
+            viaje.save()
+            return JsonResponse({'mensaje': 'Has tomado el viaje correctamente'}, status=200,safe=False)
+        except Exception as e:
+            print(f'Error en la vista: {repr(e)}')
+            return JsonResponse(str(e), status=500,safe=False)
+    
+    

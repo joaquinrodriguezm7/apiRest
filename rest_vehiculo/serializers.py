@@ -13,5 +13,5 @@ class UsuarioSerializer(serializers.ModelSerializer):
 class ViajeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Viaje
-        fields = ['id_viaje','inicio','termino','costo','patente','nombre_usuario_dueño','nombre_usuario_cliente']
+        fields = '__all__'
         safe = False
