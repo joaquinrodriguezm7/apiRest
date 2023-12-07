@@ -5,4 +5,5 @@ urlpatterns = [
     path('user', UserView.as_view()),
     path('vehiculo', VehiculoView.as_view()),
     path('viaje', ViajeView.as_view()),
+    path('viaje/<int:id_viaje>/', ViajeView.as_view()),
 ]

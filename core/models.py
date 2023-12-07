@@ -33,7 +33,7 @@ class Viaje (models.Model):
     termino = models.CharField(max_length=50, null=True, blank=True)
     costo = models.IntegerField(null=True, blank=True)
     patente = models.ForeignKey('Vehiculo', to_field="patente", on_delete=models.CASCADE, null=True, blank=True)
-    nombre_usuario_dueño = models.ForeignKey('Usuario', on_delete=models.CASCADE, to_field="nombre_usuario", null=True, blank=True)
+    nombre_usuario_duenno = models.ForeignKey('Usuario', on_delete=models.CASCADE, to_field="nombre_usuario", verbose_name="Nombre Dueño", null=True, blank=True)
     nombre_usuario_cliente = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):

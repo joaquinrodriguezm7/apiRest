@@ -5,6 +5,7 @@ from core.models import Usuario, Vehiculo, Viaje
 from rest_framework.response import Response
 from rest_framework.views import status
 from rest_framework.parsers import JSONParser
+from rest_framework.generics import get_object_or_404
 from django.http import JsonResponse
 # Create your views here.
 
@@ -60,8 +61,20 @@ class VehiculoView(APIView):
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
         
 class ViajeView(APIView):
-    def get(self, request):
-        serializer = ViajeSerializer(Viaje.objects.all(), many=True)
+    def get(self, request, id_viaje=None):
+        if id_viaje is not None:
+            # Obtener detalles del viaje si se proporciona id_viaje
+            viaje = get_object_or_404(Viaje, id_viaje=id_viaje)
+            serializer = ViajeSerializer(viaje)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        else:
+            # Obtener todos los viajes si no se proporciona id_viaje
+            serializer = ViajeSerializer(Viaje.objects.all(), many=True)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+    
+    def detalleViaje(self, request, id_viaje):
+        viaje = get_object_or_404(Viaje, id_viaje=id_viaje)
+        serializer = ViajeSerializer(viaje)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
     
     def post(self,request):
