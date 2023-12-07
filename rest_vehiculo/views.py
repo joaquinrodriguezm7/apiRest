@@ -85,11 +85,12 @@ class ViajeView(APIView):
                 termino=data['termino'],
                 costo=data['costo'],
                 patente_id=data['patente'],
-                nombre_usuario_dueño_id=data['nombre_usuario_dueño'],
+                nombre_usuario_duenno_id=data['nombre_usuario_dueño'],
             )
             return JsonResponse({"mensaje":"El Viaje se ha registrado exitosamente"}, status=200,safe=False) 
         except Exception as e:
-            return JsonResponse(str(e), status=500)
+            print(f'Error en la vista: {repr(e)}')
+            return JsonResponse(str(e), status=500, safe=False)
         
     def put(self,request):
         try:
