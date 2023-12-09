@@ -42,8 +42,14 @@ class UserView(APIView):
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
     
 class VehiculoView(APIView):
-    def get(self, request):
-        serializer = VehiculoSerializer(Vehiculo.objects.all(), many=True)
+    def get(self, request, nombre_usuario=None):
+        if nombre_usuario is not None:
+            print("Nombre de usuario recibido:", nombre_usuario)
+            vehiculos = Vehiculo.objects.filter(nombre_usuario__nombre_usuario=nombre_usuario)
+        else:
+            vehiculos = Vehiculo.objects.all()
+
+        serializer = VehiculoSerializer(vehiculos, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
     
     def post(self,request):
@@ -68,12 +74,10 @@ class ViajeView(APIView):
             serializer = ViajeSerializer(viajes, many=True)
             return Response(status=status.HTTP_200_OK, data=serializer.data)
         elif id_viaje is not None:
-            # Obtener detalles del viaje si se proporciona id_viaje
             viaje = get_object_or_404(Viaje, id_viaje=id_viaje)
             serializer = ViajeSerializer(viaje)
             return Response(status=status.HTTP_200_OK, data=serializer.data)
         else:
-            # Obtener todos los viajes si no se proporciona id_viaje
             serializer = ViajeSerializer(Viaje.objects.all(), many=True)
             return Response(status=status.HTTP_200_OK, data=serializer.data)
     
@@ -82,9 +86,10 @@ class ViajeView(APIView):
         serializer = ViajeSerializer(viaje)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
     
-    def post(self,request):
+    def post(self, request):
         try:
             data = JSONParser().parse(request)
+
             Viaje.objects.create(
                 nombre_sede_id=data['sede'],
                 inicio=data['inicio'],
@@ -92,26 +97,38 @@ class ViajeView(APIView):
                 costo=data['costo'],
                 patente_id=data['patente'],
                 nombre_usuario_duenno_id=data['nombre_usuario_dueño'],
+                capacidad_disponible=data['capacidad'],
             )
-            return JsonResponse({"mensaje":"El Viaje se ha registrado exitosamente"}, status=200,safe=False) 
+
+            return JsonResponse({"mensaje": "El Viaje se ha registrado exitosamente"}, status=200)
         except Exception as e:
             print(f'Error en la vista: {repr(e)}')
             return JsonResponse(str(e), status=500, safe=False)
         
-    def put(self,request):
+    def put(self, request):
         try:
             data = JSONParser().parse(request)
-            id_viaje=data['id_viaje']
-            nombre_usuario_cliente = data['nombre_usuario_cliente']
+            id_viaje = data['id_viaje']
+            nombre_usuario_cliente_nombre = data['nombre_usuario_cliente']  # Cambiado el nombre para mayor claridad
 
             viaje = Viaje.objects.get(id_viaje=id_viaje)
-            
-            viaje.nombre_usuario_cliente = nombre_usuario_cliente
-            viaje.save()
-            return JsonResponse({'mensaje': 'Has tomado el viaje correctamente'}, status=200,safe=False)
+
+            if viaje.capacidad_disponible > 0:
+                # Buscar el objeto Usuario correspondiente al nombre de usuario
+                usuario_cliente = Usuario.objects.get(nombre_usuario=nombre_usuario_cliente_nombre)
+
+                viaje.nombre_usuario_cliente.add(usuario_cliente)
+                viaje.capacidad_disponible -= 1
+                viaje.save()
+
+                return JsonResponse({'mensaje': 'Has tomado el viaje correctamente'}, status=200)
+            else:
+                return JsonResponse({'error': 'No hay capacidad disponible en el vehículo'}, status=400)
+        except Usuario.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
         except Exception as e:
             print(f'Error en la vista: {repr(e)}')
-            return JsonResponse(str(e), status=500,safe=False)
+            return JsonResponse(str(e), status=500, safe=False)
     
 class SedeView(APIView): 
     def get(self, request):
