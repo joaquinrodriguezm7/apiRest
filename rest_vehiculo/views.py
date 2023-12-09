@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import UsuarioSerializer, VehiculoSerializer, ViajeSerializer
-from core.models import Usuario, Vehiculo, Viaje
+from .serializers import UsuarioSerializer, VehiculoSerializer, ViajeSerializer, SedeSerializar
+from core.models import Usuario, Vehiculo, Viaje, Sede
 from rest_framework.response import Response
 from rest_framework.views import status
 from rest_framework.parsers import JSONParser
@@ -62,7 +62,12 @@ class VehiculoView(APIView):
         
 class ViajeView(APIView):
     def get(self, request, id_viaje=None):
-        if id_viaje is not None:
+        sede = self.request.query_params.get('sede', None)
+        if sede:
+            viajes = Viaje.objects.filter(nombre_sede__nombre_sede=sede)
+            serializer = ViajeSerializer(viajes, many=True)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        elif id_viaje is not None:
             # Obtener detalles del viaje si se proporciona id_viaje
             viaje = get_object_or_404(Viaje, id_viaje=id_viaje)
             serializer = ViajeSerializer(viaje)
@@ -81,6 +86,7 @@ class ViajeView(APIView):
         try:
             data = JSONParser().parse(request)
             Viaje.objects.create(
+                nombre_sede_id=data['sede'],
                 inicio=data['inicio'],
                 termino=data['termino'],
                 costo=data['costo'],
@@ -107,3 +113,7 @@ class ViajeView(APIView):
             print(f'Error en la vista: {repr(e)}')
             return JsonResponse(str(e), status=500,safe=False)
     
+class SedeView(APIView): 
+    def get(self, request):
+        serializer = SedeSerializar(Sede.objects.all(), many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)

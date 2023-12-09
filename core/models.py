@@ -4,8 +4,8 @@ from django.db import models
 
 class Usuario (models.Model):
     id_usuario = models.AutoField(primary_key=True, verbose_name='id_usuario')
-    nombre_usuario = models.CharField(max_length=50, verbose_name='Nombre del Usuario',null=False,blank=False, unique=True)
-    password_usuario = models.CharField(max_length=50, verbose_name='Password del Usuario',null=False,blank=False)
+    nombre_usuario = models.CharField(max_length=50, verbose_name='Nombre del Usuario',null=True,blank=True, unique=True)
+    password_usuario = models.CharField(max_length=50, verbose_name='Password del Usuario',null=True,blank=True)
     tipoUsuario = models.ForeignKey('tipoUsuario', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -16,7 +16,7 @@ class Vehiculo (models.Model):
     marca = models.CharField(max_length=30, verbose_name='Marca del Vehiculo')
     modelo = models.CharField(max_length=30, verbose_name='Modelo  del Vehiculo')
     capacidad = models.IntegerField(null=True, blank=True)
-    nombre_usuario = models.ForeignKey('Usuario', to_field="nombre_usuario", on_delete=models.CASCADE, null=True, blank=True, default='')
+    nombre_usuario = models.ForeignKey('Usuario', to_field="nombre_usuario", on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return str(self.patente)
@@ -29,6 +29,7 @@ class tipoUsuario (models.Model):
     
 class Viaje (models.Model):
     id_viaje = models.AutoField(primary_key=True, verbose_name="id_viaje")
+    nombre_sede = models.ForeignKey('Sede', to_field="nombre_sede", on_delete=models.CASCADE, blank=True)
     inicio = models.CharField(max_length=50, null=True, blank=True)
     termino = models.CharField(max_length=50, null=True, blank=True)
     costo = models.IntegerField(null=True, blank=True)
@@ -38,3 +39,10 @@ class Viaje (models.Model):
 
     def __str__(self):
         return str(self.id_viaje)
+    
+class Sede (models.Model):
+    id_sede = models.AutoField(primary_key=True, blank=True)
+    nombre_sede = models.CharField(max_length=20, unique=True, blank=True)
+
+    def __str__(self):
+        return str(self.nombre_sede)

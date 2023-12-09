@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Usuario, Vehiculo, Viaje
+from core.models import Usuario, Vehiculo, Viaje, Sede
 class VehiculoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehiculo
@@ -13,5 +13,11 @@ class UsuarioSerializer(serializers.ModelSerializer):
 class ViajeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Viaje
+        fields = '__all__'
+        safe = False
+
+class SedeSerializar(serializers.ModelSerializer):
+    class Meta:
+        model = Sede
         fields = '__all__'
         safe = False
