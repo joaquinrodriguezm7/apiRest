@@ -29,7 +29,7 @@ class UserView(APIView):
         try:
             data = JSONParser().parse(request)
             usuario = data['usuario']
-            nuevaPass = data['pass']
+            nuevaPass = data['password1']
 
             usuario = Usuario.objects.get(nombre_usuario = usuario)
 
