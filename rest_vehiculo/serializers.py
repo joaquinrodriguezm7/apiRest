@@ -12,12 +12,10 @@ class UsuarioSerializer(serializers.ModelSerializer):
         safe = False
 
 class ViajeSerializer(serializers.ModelSerializer):
-    # ... otros campos ...
 
     nombre_usuario_cliente = serializers.SerializerMethodField()
 
     def get_nombre_usuario_cliente(self, viaje):
-        # Devuelve una lista de nombres de usuarios clientes asociados al viaje
         return [usuario.nombre_usuario for usuario in viaje.nombre_usuario_cliente.all()]
 
     class Meta:
