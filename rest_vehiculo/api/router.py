@@ -7,5 +7,6 @@ urlpatterns = [
     path('vehiculo/<str:nombre_usuario>/', VehiculoView.as_view()),
     path('viaje', ViajeView.as_view()),
     path('viaje/<int:id_viaje>/', ViajeView.as_view()),
+    path('viaje/enviar-correo/', ViajeView.as_view(), name='enviar_correo_confirmacion'),
     path('sede', SedeView.as_view()),
 ]

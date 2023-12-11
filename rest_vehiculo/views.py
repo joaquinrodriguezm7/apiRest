@@ -7,11 +7,22 @@ from rest_framework.views import status
 from rest_framework.parsers import JSONParser
 from rest_framework.generics import get_object_or_404
 from django.http import JsonResponse
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime
 # Create your views here.
 
 class UserView(APIView):
     def get(self, request):
-        serializer = UsuarioSerializer(Usuario.objects.all(), many=True)
+        nombre_usuario = self.request.query_params.get('nombre_usuario', None)
+
+        if nombre_usuario:
+            usuario = get_object_or_404(Usuario, nombre_usuario=nombre_usuario)
+            serializer = UsuarioSerializer(usuario)
+        else:
+            serializer = UsuarioSerializer(Usuario.objects.all(), many=True)
+
         return Response(status=status.HTTP_200_OK, data=serializer.data)
     
     def post(self, request):
@@ -20,11 +31,11 @@ class UserView(APIView):
             usuario = data['usuario']
             password = data['pass']
             serializer = UsuarioSerializer(Usuario.objects.get(nombre_usuario=usuario, password_usuario=password))
-            return JsonResponse(serializer.data)
+            return JsonResponse(serializer.data, safe=False)
         except Usuario.DoesNotExist:
-            return JsonResponse(status=400)
+            return JsonResponse(status=400, safe=False)
         except Exception as e:
-            return JsonResponse(status=500)
+            return JsonResponse(str(e),status=500, safe=False)
     def put(self, request):
         try:
             data = JSONParser().parse(request)
@@ -109,17 +120,17 @@ class ViajeView(APIView):
         try:
             data = JSONParser().parse(request)
             id_viaje = data['id_viaje']
-            nombre_usuario_cliente_nombre = data['nombre_usuario_cliente']  # Cambiado el nombre para mayor claridad
-
+            nombre_usuario_cliente = data['nombre_usuario_cliente'] 
+            correo_pasajero = data['correo_pasajero'] 
             viaje = Viaje.objects.get(id_viaje=id_viaje)
 
             if viaje.capacidad_disponible > 0:
-                # Buscar el objeto Usuario correspondiente al nombre de usuario
-                usuario_cliente = Usuario.objects.get(nombre_usuario=nombre_usuario_cliente_nombre)
-
+                usuario_cliente = Usuario.objects.get(nombre_usuario=nombre_usuario_cliente)
                 viaje.nombre_usuario_cliente.add(usuario_cliente)
                 viaje.capacidad_disponible -= 1
                 viaje.save()
+
+                self.enviar_correo_confirmacion(nombre_usuario_cliente, correo_pasajero)
 
                 return JsonResponse({'mensaje': 'Has tomado el viaje correctamente'}, status=200)
             else:
@@ -129,7 +140,34 @@ class ViajeView(APIView):
         except Exception as e:
             print(f'Error en la vista: {repr(e)}')
             return JsonResponse(str(e), status=500, safe=False)
-    
+
+    def enviar_correo_confirmacion(self, nombre_pasajero, correo_pasajero):
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587
+        smtp_user = 'test1234.noreply@gmail.com'
+        smtp_password = 'contrasenna_'
+        usuario = Usuario.objects.get(nombre_usuario=nombre_pasajero)
+        usuario = usuario.nombre_usuario
+
+        subject = 'Viaje Tomado!'
+        body = f'El {usuario} ha tomado el viaje correctamente'
+
+        from_email = 'test1234.noreply@gmail.com'
+        to_email = correo_pasajero
+
+        message = MIMEMultipart()
+        message['From'] = from_email
+        message['To'] = to_email
+        message['Subject'] = subject
+        message.attach(MIMEText(body, 'plain'))
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+
+            # Envío del mensaje
+            server.sendmail(from_email, to_email, message.as_string())
+
 class SedeView(APIView): 
     def get(self, request):
         serializer = SedeSerializar(Sede.objects.all(), many=True)

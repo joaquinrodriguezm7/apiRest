@@ -8,13 +8,21 @@ class VehiculoSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['id_usuario', 'nombre_usuario', 'password_usuario','tipoUsuario']
+        fields = ['id_usuario', 'nombre_usuario', 'password_usuario','tipoUsuario','correo_usuario']
         safe = False
+
 class ViajeSerializer(serializers.ModelSerializer):
+    # ... otros campos ...
+
+    nombre_usuario_cliente = serializers.SerializerMethodField()
+
+    def get_nombre_usuario_cliente(self, viaje):
+        # Devuelve una lista de nombres de usuarios clientes asociados al viaje
+        return [usuario.nombre_usuario for usuario in viaje.nombre_usuario_cliente.all()]
+
     class Meta:
         model = Viaje
         fields = '__all__'
-        safe = False
 
 class SedeSerializar(serializers.ModelSerializer):
     class Meta:

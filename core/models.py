@@ -6,6 +6,7 @@ class Usuario (models.Model):
     id_usuario = models.AutoField(primary_key=True, verbose_name='id_usuario')
     nombre_usuario = models.CharField(max_length=50, verbose_name='Nombre del Usuario',null=True,blank=True, unique=True)
     password_usuario = models.CharField(max_length=50, verbose_name='Password del Usuario',null=True,blank=True)
+    correo_usuario = models.EmailField(max_length=50, verbose_name='Correo del Usuario', null=True, blank=True, unique=True)
     tipoUsuario = models.ForeignKey('tipoUsuario', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -34,8 +35,7 @@ class Viaje (models.Model):
     termino = models.CharField(max_length=50, null=True, blank=True)
     costo = models.IntegerField(null=True, blank=True)
     patente = models.ForeignKey('Vehiculo', to_field="patente", on_delete=models.CASCADE, null=True, blank=True)
-    nombre_usuario_duenno = models.ForeignKey('Usuario', on_delete=models.CASCADE, to_field="nombre_usuario", verbose_name="Nombre Dueño", null=True, blank=True)
-    nombre_usuario_cliente = models.CharField(max_length=50, null=True, blank=True)
+    nombre_usuario_duenno = models.ForeignKey('Usuario', on_delete=models.CASCADE, to_field="nombre_usuario", verbose_name="Nombre Dueño", null=True, blank=True, related_name="re_nombre_usuario_duenno")
     capacidad_disponible = models.IntegerField(null=True, blank=True)
     nombre_usuario_cliente = models.ManyToManyField('Usuario', related_name='viajes_cliente', blank=True)
     def __str__(self):
